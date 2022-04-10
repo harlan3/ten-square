@@ -88,11 +88,12 @@ int init() {
 	return 1;
 }
 
-void setProjectionMatrix()
-{
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(atan(tan(50.0 * M_PI / 360.0) / zoomFactor) * 360.0 / M_PI, (float)width/(float)height, 0.0001, 100);
+void setProjectionMatrix() {
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(atan(tan(50.0 * M_PI / 360.0) / zoomFactor) * 360.0 / M_PI,
+			(float) width / (float) height, 0.0001, 100);
 }
 
 void display() {
@@ -216,11 +217,11 @@ void display() {
 }
 
 double getZRotInc() {
-	return pow(1.2203*zoomFactor, -0.415);
+	return pow(1.2203 * zoomFactor, -0.415);
 }
 
 double getZScrollInc() {
-	return pow(0.5881*zoomFactor, -0.656);
+	return pow(0.5881 * zoomFactor, -0.656);
 }
 
 void idleFunction() {
@@ -300,7 +301,7 @@ void mouseCB(int button, int state, int x, int y) {
 	} else if (button == GLUT_RIGHT_BUTTON) {
 		if (state == GLUT_DOWN)
 			mouseRightDown = true;
-	    else if (state == GLUT_UP)
+		else if (state == GLUT_UP)
 			mouseRightDown = false;
 	} else if (button == 3) { // Scroll wheel up
 		if (state == GLUT_UP)
