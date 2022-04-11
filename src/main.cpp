@@ -265,13 +265,13 @@ void keyboard(unsigned char key, int x, int y) {
 			fullScreen = false;
 		}
 		break;
-	case 'S':
+	case 'Z':
 		if (zoomFactor > 1.99) {
 			zoomFactor -= 1.0f;
 			glutPostRedisplay();
 		}
 		break;
-	case 's':
+	case 'z':
 		if (zoomFactor < 99.01) {
 			zoomFactor += 1.0f;
 			glutPostRedisplay();
