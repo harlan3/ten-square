@@ -1,2 +1,2 @@
 # ten-square
-OpenGL Decagon Prism Surface Viewer
+OpenGL Decagonal Prism Surface Viewer

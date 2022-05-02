@@ -27,8 +27,8 @@ bool BMP_File_Loader::LoadImage(string filename, unsigned char *&data,
 		unsigned int &width, unsigned int &height) {
 
 	FILE *file;
-	unsigned long offset, index;
-	unsigned int datasize, scanline_size, cur_scanline, bytes_per_pixel;
+	unsigned long index;
+	unsigned int offset, datasize, scanline_size, cur_scanline, bytes_per_pixel;
 	unsigned char *scanline_data;
 
 	BitmapHeaderInfo bmpHeader;
@@ -39,13 +39,13 @@ bool BMP_File_Loader::LoadImage(string filename, unsigned char *&data,
 
 	// read bitmap data offset
 	fseek(file, 10, SEEK_SET);
-	fread(&offset, sizeof(int), 1, file);
+	fread(&offset, sizeof(unsigned int), 1, file);
 
 	// image properties
 	fseek(file, 18, SEEK_SET);
-	fread(&bmpHeader.width, sizeof(int), 1, file);
-	fread(&bmpHeader.height, sizeof(int), 1, file);
-	fread(&bmpHeader.planes, sizeof(short int), 1, file);
+	fread(&bmpHeader.width, sizeof(unsigned int), 1, file);
+	fread(&bmpHeader.height, sizeof(unsigned int), 1, file);
+	fread(&bmpHeader.planes, sizeof(unsigned short), 1, file);
 
 	if (bmpHeader.planes != 1) {
 		cerr << "BMP File Loader: planes from " << filename << " is not 1: "
@@ -53,7 +53,7 @@ bool BMP_File_Loader::LoadImage(string filename, unsigned char *&data,
 		return false;
 	}
 
-	fread(&bmpHeader.bitCount, sizeof(unsigned short int), 1, file);
+	fread(&bmpHeader.bitCount, sizeof(unsigned short), 1, file);
 	if (bmpHeader.bitCount != 24) {
 		cerr << "BMP File Loader: bmp depth from " << filename << " is not 24: "
 				<< bmpHeader.bitCount << endl;
