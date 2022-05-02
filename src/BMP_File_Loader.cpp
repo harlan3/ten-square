@@ -1,5 +1,5 @@
 /*
- * Ten Square (OpenGL Decagon Prism Surface Viewer)
+ * Ten Square (OpenGL Decagonal Prism Surface Viewer)
  * Copyright (c) 2022 Harlan Murphy - Orbisoftware
  *
  * This program is free software: you can redistribute it and/or modify
