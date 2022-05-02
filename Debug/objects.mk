@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lglut -lGLU -lGL
+LIBS := -lboost_thread -lpthread -lboost_regex -lglut -lGLU -lGL
 

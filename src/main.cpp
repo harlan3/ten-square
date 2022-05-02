@@ -15,11 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/thread.hpp>
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
+#include "JSONObject.hpp"
+#include "server/ServerMain.hpp"
+#include "server/ReceiveDatagramThread.hpp"
 
 #include "BMP_File_Loader.h"
 
@@ -35,16 +39,29 @@ bool mouseLeftDown;
 bool mouseRightDown;
 int zoomFactor = 1.0;
 
-void loadGLTextures() {
+// Search Tool Controls
+int curPageNum = 1;
+int newPageNum = 1;
+int curTextureIndex = 1;
+int newTextureIndex = 1;
+int newZoomFactor = 1;
+int curZoomFactor = 1;
 
-	const char *bmpFile[1] = { "ref_images/grid512.bmp" };
+bool appRunning = true;
+ServerMain serverMain;
+ReceiveDatagramThread receivedDatagramThread;
+
+void loadGLTexture(int faceIndex) {
+
+	string bmpFileStr = "textures/face" + std::to_string(faceIndex) + ".bmp";
+	const char *bmpFile = bmpFileStr.c_str();
 
 	for (int i = 0; i < 1; ++i) {
 
 		BMP_File_Loader bmpFileLoader;
 		unsigned char *bytes;
 		unsigned int imageWidth, imageHeight;
-		bmpFileLoader.LoadImage(bmpFile[i], bytes, imageWidth, imageHeight);
+		bmpFileLoader.LoadImage(bmpFile, bytes, imageWidth, imageHeight);
 
 		// texture format based on # of bits per pixel
 		GLint format = GL_RGB;
@@ -78,7 +95,7 @@ int init() {
 	glCullFace(GL_FRONT);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_2D);
-	loadGLTextures();
+	loadGLTexture(1);
 
 	xRot = -90;
 	zRot = 0;
@@ -224,6 +241,21 @@ double getZScrollInc() {
 	return pow(0.5881 * zoomFactor, -0.656);
 }
 
+void lookAtPage(int newPageNum) {
+
+	int row;
+
+	if (newPageNum % 10 == 0)
+		row = (newPageNum / 10);
+	else
+		row = (newPageNum / 10) + 1;
+
+	int column = newPageNum % 10;
+
+	zRot = -36.083 * column + 108.45;
+	zDist = -0.6184 * row + 3.3992;
+}
+
 void idleFunction() {
 
 	if (mouseLeftDown) {
@@ -231,6 +263,24 @@ void idleFunction() {
 		glutPostRedisplay();
 	} else if (mouseRightDown) {
 		zRot += getZRotInc();
+		glutPostRedisplay();
+	}
+
+	if (curTextureIndex != newTextureIndex) {
+		loadGLTexture(newTextureIndex);
+		curTextureIndex = newTextureIndex;
+		glutPostRedisplay();
+	}
+
+	if (curPageNum != newPageNum) {
+		lookAtPage(newPageNum);
+		curPageNum = newPageNum;
+		glutPostRedisplay();
+	}
+
+	if (curZoomFactor != newZoomFactor) {
+		zoomFactor = newZoomFactor;
+		curZoomFactor = newZoomFactor;
 		glutPostRedisplay();
 	}
 }
@@ -242,8 +292,6 @@ void reshape(int w, int h) {
 
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 	setProjectionMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -285,6 +333,7 @@ void keyboard(unsigned char key, int x, int y) {
 		cout << "zoomFactor = " << zoomFactor << endl;
 		break;
 	case 'q':
+		appRunning = false;
 		exit(0);
 	default:
 		break;
@@ -306,22 +355,60 @@ void mouseCB(int button, int state, int x, int y) {
 	} else if (button == 3) { // Scroll wheel up
 		if (state == GLUT_UP)
 			return;
-		zDist += getZScrollInc();
+		zDist += getZScrollInc() * 0.2;
 	} else if (button == 4) { // Scroll wheel down
 		if (state == GLUT_UP)
 			return;
-		zDist -= getZScrollInc();
+		zDist -= getZScrollInc() * 0.2;
 	}
 
 	glutPostRedisplay();
 }
 
+void processMessages() {
+
+	while (appRunning) {
+
+		vector<JSONPacket> packetList;
+
+		receivedDatagramThread.drainTo(packetList);
+
+		for (JSONPacket packet : packetList) {
+
+			json::JSONObject jsonObject(packet.data);
+			int msgId = jsonObject.getInt("msgId");
+
+			switch (msgId) {
+
+			case 1:
+				newTextureIndex = jsonObject.getInt("newTextureIndex");
+				break;
+
+			case 2:
+				newPageNum = jsonObject.getInt("newPageNum");
+				break;
+
+			case 3:
+				newZoomFactor = jsonObject.getInt("newZoomFactor");
+				break;
+			}
+
+		}
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	}
+}
+
 int main(int argc, char **argv) {
+
+	boost::thread t1(&processMessages);
+
+	receivedDatagramThread.start();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("Ten Square Surface Viewer");
+	glutCreateWindow("Ten-Square Surface Viewer");
 	init();
 	glutDisplayFunc(display);
 	glutIdleFunc(idleFunction);
