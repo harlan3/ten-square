@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
+#include <png.h>
+
 #include "JSONObject.hpp"
 #include "server/ServerMain.hpp"
 #include "server/ReceiveDatagramThread.hpp"
-
-#include "BMP_File_Loader.h"
 
 void mouseCB(int button, int stat, int x, int y);
 
@@ -51,21 +51,79 @@ bool appRunning = true;
 ServerMain serverMain;
 ReceiveDatagramThread receivedDatagramThread;
 
+bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha,
+		GLubyte **outData) {
+
+	png_structp png_ptr;
+	png_infop info_ptr;
+	unsigned int sig_read = 0;
+	int color_type, interlace_type;
+	FILE *fp;
+
+	if ((fp = fopen(name, "rb")) == NULL)
+		return false;
+
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (png_ptr == NULL) {
+		fclose(fp);
+		return false;
+	}
+
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL) {
+		fclose(fp);
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
+		return false;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+
+		return false;
+	}
+
+	png_init_io(png_ptr, fp);
+	png_set_sig_bytes(png_ptr, sig_read);
+	png_read_png(png_ptr, info_ptr,
+			PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING
+					| PNG_TRANSFORM_EXPAND, NULL);
+
+	png_uint_32 width, height;
+	int bit_depth;
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
+			&interlace_type, NULL, NULL);
+	outWidth = width;
+	outHeight = height;
+
+	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
+	*outData = (unsigned char*) malloc(row_bytes * outHeight);
+
+	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
+
+	for (int i = 0; i < outHeight; i++)
+		memcpy(*outData + (row_bytes * i), row_pointers[i], row_bytes);
+
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+	fclose(fp);
+
+	return true;
+}
+
 void loadGLTexture(int faceIndex) {
 
-	string bmpFileStr = "textures/face" + std::to_string(faceIndex) + ".bmp";
-	const char *bmpFile = bmpFileStr.c_str();
+	string pngFileStr = "textures/face" + std::to_string(faceIndex) + ".png";
+	const char *pngFile = pngFileStr.c_str();
 
 	for (int i = 0; i < 1; ++i) {
 
-		BMP_File_Loader bmpFileLoader;
-		unsigned char *bytes;
-		unsigned int imageWidth, imageHeight;
-		bmpFileLoader.LoadImage(bmpFile, bytes, imageWidth, imageHeight);
-
-		// texture format based on # of bits per pixel
-		GLint format = GL_RGB;
-		GLint internalFormat = GL_RGB8;
+		GLubyte *textureImage;
+		int imageWidth, imageHeight;
+		bool hasAlpha;
+		loadPngImage((char*) pngFile, imageWidth, imageHeight, hasAlpha,
+				&textureImage);
 
 		// copy the texture to OpenGL
 		glGenTextures(1, &texture[i]);
@@ -77,10 +135,11 @@ void loadGLTexture(int faceIndex) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// copy bitmap data to texture object
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, imageWidth, imageHeight,
-				0, format, GL_UNSIGNED_BYTE, bytes);
+		glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? 4 : 3, imageWidth,
+				imageHeight, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
+				textureImage);
 
-		free(bytes);
+		free(textureImage);
 
 		// unbind
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -296,13 +355,7 @@ void reshape(int w, int h) {
 
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case '1':
-		xRot = -90;
-		zRot = 0;
-		zDist = 0;
-		zoomFactor = 1.0;
-		glutPostRedisplay();
-		break;
+
 	case 'f':
 		if (!fullScreen) {
 			glutFullScreen();

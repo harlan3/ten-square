@@ -1,6 +1,7 @@
-import cv2
 import os
+import cv2
 import numpy as np
+import imageio
 
 global black_img
 src_folder = "images"
@@ -83,4 +84,6 @@ for x in range(num_black):
 
 for x in range(num_faces):
     mosaic = make_mosaic_image(padded, x * 100)
-    cv2.imwrite(dest_folder + "//face" + str(x+1) + ".bmp", mosaic)
+    cv2.imwrite(dest_folder + "//face" + str(x+1) + ".png", mosaic)
+    #if exception from cv2.imwriter above try the line below instead
+    #imageio.imsave(dest_folder + "//face" + str(x+1) + ".png", mosaic)
