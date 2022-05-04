@@ -15,27 +15,9 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-    
-def resize(images, scale_percent):
- 
-    images_resized = []
-    
-    for img in images:
-        #print('Original Dimensions: ',img.shape)   
-        width = int(img.shape[1] * scale_percent / 100)
-        height = int(img.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-        #print('Resized Dimensions: ',resized.shape)
-        images_resized.append(resized)
-		
-    return images_resized
 
 def pad_images_to_same_size(images):
-    """
-    :param images: sequence of images
-    :return: list of images padded so that all images have same width and height (max width and height are used)
-    """
+	
     width_max = 0
     height_max = 0
     for img in images:
@@ -86,7 +68,7 @@ def make_mosaic_image(images, index):
 global black_img
 
 images = load_images_from_folder(src_folder)
-padded = pad_images_to_same_size(resize(images, 25))
+padded = pad_images_to_same_size(images)
 
 image_count = len(padded)
 if (image_count % 100 == 0):

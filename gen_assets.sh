@@ -9,10 +9,10 @@ mkdir split_pdfs
 java -jar dist/splitpdfs.jar
 cd ../../
 
-cd ./processpdfs
-mkdir images
-python3 pdf2png.py
-cd ../
+cd ./processpdfs/extractimages/
+mkdir ../images
+java -jar dist/extractimages.jar
+cd ../../
 
 mkdir ./textures
 cd ./processpdfs

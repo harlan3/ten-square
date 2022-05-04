@@ -12,6 +12,10 @@ cd ./processpdfs/splitpdfs/
 ant clean;ant
 cd ../../
 
+cd ./processpdfs/extractimages/
+ant clean;ant
+cd ../../
+
 cd ./searchtool/
 ant clean;ant
 cd ../
