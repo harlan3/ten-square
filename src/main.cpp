@@ -52,7 +52,7 @@ ServerMain serverMain;
 ReceiveDatagramThread receivedDatagramThread;
 
 bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha,
-		GLubyte **outData) {
+		unsigned char *&outData) {
 
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -87,8 +87,8 @@ bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha,
 	png_init_io(png_ptr, fp);
 	png_set_sig_bytes(png_ptr, sig_read);
 	png_read_png(png_ptr, info_ptr,
-			PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING
-					| PNG_TRANSFORM_EXPAND, NULL);
+	PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
+			NULL);
 
 	png_uint_32 width, height;
 	int bit_depth;
@@ -98,12 +98,12 @@ bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha,
 	outHeight = height;
 
 	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
-	*outData = (unsigned char*) malloc(row_bytes * outHeight);
+	outData = (unsigned char*) malloc(row_bytes * outHeight);
 
 	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
 
 	for (int i = 0; i < outHeight; i++)
-		memcpy(*outData + (row_bytes * i), row_pointers[i], row_bytes);
+		memcpy(outData + (row_bytes * i), row_pointers[i], row_bytes);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
@@ -119,11 +119,11 @@ void loadGLTexture(int faceIndex) {
 
 	for (int i = 0; i < 1; ++i) {
 
-		GLubyte *textureImage;
+		unsigned char *textureImage;
 		int imageWidth, imageHeight;
 		bool hasAlpha;
 		loadPngImage((char*) pngFile, imageWidth, imageHeight, hasAlpha,
-				&textureImage);
+				textureImage);
 
 		// copy the texture to OpenGL
 		glGenTextures(1, &texture[i]);
@@ -135,6 +135,7 @@ void loadGLTexture(int faceIndex) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// copy bitmap data to texture object
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? 4 : 3, imageWidth,
 				imageHeight, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
 				textureImage);
@@ -342,6 +343,9 @@ void idleFunction() {
 		curZoomFactor = newZoomFactor;
 		glutPostRedisplay();
 	}
+
+	if (!appRunning)
+		exit(0);
 }
 
 void reshape(int w, int h) {
@@ -387,7 +391,8 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'q':
 		appRunning = false;
-		exit(0);
+		break;
+
 	default:
 		break;
 	}
