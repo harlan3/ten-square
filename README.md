@@ -20,14 +20,14 @@ After installing the prerequisites, run the following scripts:
 * ./build_execs.sh
 * ./wipe_assets.sh
 * ./gen_assets.sh
-All of these scripts must complete without any errors.
+<br>All of these scripts must complete without any errors.
 
 Execution:
 Run ten-square with following command:
 * Debug/tensquare
-This should bring up the Decagonal Prism textured with the PDF pages from PDF files located
+<br>This should bring up the Decagonal Prism textured with the PDF pages from PDF files located
 in the source_pdfs folder.
-Next run the Search Tool:
+<br>Next run the Search Tool:
 * cd searchtool
 * java -jar dist/searchtool.jar
 
@@ -43,7 +43,7 @@ Keyboard Controls
 * q - quit
 
 Search Tool
-Select texture index to display in combo box.
-Type in keyword and select search to query database for keyword match from pdf text content.
-Select one of the search results to view that page on the Decagonal Prism.
-Use slider bar to zoom in and out and mouse controls as defined above.
+<br>Select texture index to display in combo box.
+<br>Type in keyword and select search to query database for keyword match from pdf text content.
+<br>Select one of the search results to view that page on the Decagonal Prism.
+<br>Use slider bar to zoom in and out and mouse controls as defined above.
