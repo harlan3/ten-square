@@ -109,6 +109,7 @@ public class SearchTool {
 				jsonObject.put("msgId", new Integer(1));
 				jsonObject.put("newTextureIndex", new Integer(pdfTextureIndex));
 				clientMain.sendUDPMessage(jsonObject.toString());
+				list1.removeAll();
 			}
 		};
 		combo.addListener(SWT.Selection, listener1);
