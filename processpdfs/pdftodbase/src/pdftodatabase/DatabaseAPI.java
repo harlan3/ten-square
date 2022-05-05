@@ -52,7 +52,7 @@ public class DatabaseAPI {
 			for (int i = 1; i <= numberTables; i++) {
 
 				stmt.execute("CREATE TABLE PageMetaData" + i + " (" + "id VARCHAR(36) PRIMARY KEY, "
-						+ "pageNumber INTEGER, " + "text VARCHAR(8192))");
+						+ "pageNumber INTEGER, " + "text VARCHAR(32672))");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

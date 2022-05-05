@@ -36,10 +36,11 @@ public class ExtractImages extends PDFStreamEngine {
 	String pdfDir = "../splitpdfs/split_pdfs";
 	String imgDir = "../images";
 
-	// Generated image sizes must not exceed GL_MAX_TEXTURE_SIZE limit (typical 16384 per side)
-	double resizeRatio = 0.49;
-	
-	public String padLeftZeros(String inputString, int length) {
+	// Generated image sizes must not exceed GL_MAX_TEXTURE_SIZE limit (typical
+	// 16384 per side)
+	double targetTextureSide = 15500.0;
+
+	private String padLeftZeros(String inputString, int length) {
 
 		if (inputString.length() >= length) {
 			return inputString;
@@ -53,6 +54,20 @@ public class ExtractImages extends PDFStreamEngine {
 		return sb.toString();
 	}
 
+	private double calculateResizeRatio(float width) {
+
+		double sideDim;
+		double totalPixelWidth;
+		double resizeRatio;
+
+		sideDim = width * (1.0 / 72.0); // 1 pt = 1/72 inch
+		totalPixelWidth = sideDim * 300.0 * 10.0;
+		resizeRatio = targetTextureSide / totalPixelWidth;
+		resizeRatio = Math.floor(resizeRatio * 100) / 100;
+
+		return resizeRatio;
+	}
+
 	public static void main(String[] args) throws IOException {
 
 		ExtractImages extractImages = new ExtractImages();
@@ -64,12 +79,14 @@ public class ExtractImages extends PDFStreamEngine {
 		int count = 1;
 
 		for (File pdfFile : directoryListing) {
-			
+
 			System.out.println("Working on pdf: " + pdfFile.getName());
 
 			try (final PDDocument document = PDDocument.load(pdfFile)) {
 
 				PDFRenderer pdfRenderer = new PDFRenderer(document);
+
+				double resizeRatio = extractImages.calculateResizeRatio(document.getPage(1).getMediaBox().getHeight());
 
 				for (int page = 0; page < document.getNumberOfPages(); ++page) {
 
@@ -77,9 +94,9 @@ public class ExtractImages extends PDFStreamEngine {
 					String fileName = extractImages.imgDir + File.separator + "images"
 							+ extractImages.padLeftZeros(Integer.toString(count), 5) + ".png";
 					BufferedImage resizedImage = Scalr.resize(sourceImage, Method.QUALITY, Mode.FIT_TO_WIDTH,
-							(int) (sourceImage.getWidth() * extractImages.resizeRatio), org.imgscalr.Scalr.OP_ANTIALIAS);
+							(int) (sourceImage.getWidth() * resizeRatio), org.imgscalr.Scalr.OP_ANTIALIAS);
 					ImageIO.write(resizedImage, "png", new File(fileName));
-					//System.out.println("Saving: " + fileName);
+					// System.out.println("Saving: " + fileName);
 					count++;
 				}
 				document.close();
