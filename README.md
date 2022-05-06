@@ -21,14 +21,17 @@ After installing the prerequisites, run the following scripts:
 * ./build_execs.sh
 * ./wipe_assets.sh
 * ./gen_assets.sh
-<br>All of these scripts must complete without any errors.
+
+All of these scripts must complete without any errors.
 
 Execution:
 Run ten-square with following command:
 * Debug/tensquare
-<br>This should bring up the Decagonal Prism textured with the PDF pages from PDF files located
+
+This should bring up the Decagonal Prism textured with the PDF pages from PDF files located
 in the source_pdfs folder.
-<br>Next run the Search Tool:
+
+Next run the Search Tool:
 * cd searchtool
 * java -jar dist/searchtool.jar
 
