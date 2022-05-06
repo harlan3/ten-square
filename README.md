@@ -47,7 +47,8 @@ Keyboard Controls
 * q - quit
 
 Search Tool
-<br>Select texture index to display in combo box.
-<br>Type in keyword and select search to query database for keyword match from pdf text content.
-<br>Select one of the search results to view that page on the Decagonal Prism.
-<br>Use slider bar to zoom in and out and mouse controls as defined above.
+
+* Select texture index to display in combo box.
+* Type in keyword and select search to query database for keyword match from pdf text content.
+* Select one of the search results to view that page on the Decagonal Prism.
+* Use slider bar to zoom in and out and mouse controls as defined above.
