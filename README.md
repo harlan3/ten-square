@@ -11,6 +11,7 @@ Prerequisites:
 * Linux PC with Bash terminal (Windows or Mac are not supported)
 * Hardware accelerated Open GL
 * GL_MAX_TEXTURE_SIZE of 16384 or greater
+* Modern g++ compiler
 * Python 3 
 * Python modules: cv2, numpy and imageio
 * OpenJDK 11 or newer
