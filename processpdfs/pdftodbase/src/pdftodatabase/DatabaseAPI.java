@@ -68,7 +68,7 @@ public class DatabaseAPI {
 					+ pageIndex + ",'" + text + "')");
 
 		} catch (SQLException sqlExcept) {
-			sqlExcept.printStackTrace();
+			//sqlExcept.printStackTrace();
 		}
 	}
 
