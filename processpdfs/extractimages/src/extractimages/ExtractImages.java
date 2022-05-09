@@ -17,6 +17,8 @@
 
 package extractimages;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +40,10 @@ public class ExtractImages extends PDFStreamEngine {
 
 	// Generated image sizes must not exceed GL_MAX_TEXTURE_SIZE limit (typical
 	// 16384 per side)
-	double targetTextureSide = 15500.0;
+	double targetTextureSide = 16384.0;
+	float targetDPI = 300;
+	int targetWidth = (int) (targetTextureSide / 10.0);
+	int targetHeight = (int) (targetTextureSide / 10.0);
 
 	private String padLeftZeros(String inputString, int length) {
 
@@ -52,20 +57,6 @@ public class ExtractImages extends PDFStreamEngine {
 		sb.append(inputString);
 
 		return sb.toString();
-	}
-
-	private double calculateResizeRatio(float width) {
-
-		double sideDim;
-		double totalPixelWidth;
-		double resizeRatio;
-
-		sideDim = width * (1.0 / 72.0); // 1 pt = 1/72 inch
-		totalPixelWidth = sideDim * 300.0 * 10.0;
-		resizeRatio = targetTextureSide / totalPixelWidth;
-		resizeRatio = Math.floor(resizeRatio * 100) / 100;
-
-		return resizeRatio;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -86,17 +77,24 @@ public class ExtractImages extends PDFStreamEngine {
 
 				PDFRenderer pdfRenderer = new PDFRenderer(document);
 
-				double resizeRatio = extractImages.calculateResizeRatio(document.getPage(1).getMediaBox().getHeight());
-
 				for (int page = 0; page < document.getNumberOfPages(); ++page) {
 
-					BufferedImage sourceImage = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
+					BufferedImage sourceImage = pdfRenderer.renderImageWithDPI(page, extractImages.targetDPI,
+							ImageType.RGB);
+					Image scaledImage = sourceImage.getScaledInstance(extractImages.targetWidth,
+							extractImages.targetHeight, Image.SCALE_SMOOTH);
+					sourceImage.getGraphics().drawImage(scaledImage, 0, 0, null);
+
+					int type = BufferedImage.TYPE_INT_RGB;
+					BufferedImage scaledBufferedImage = new BufferedImage(scaledImage.getWidth(null),
+							scaledImage.getHeight(null), type);
+					Graphics g = scaledBufferedImage.createGraphics();
+					g.drawImage(scaledImage, 0, 0, null);
+					g.dispose();
+
 					String fileName = extractImages.imgDir + File.separator + "images"
 							+ extractImages.padLeftZeros(Integer.toString(count), 5) + ".png";
-					BufferedImage resizedImage = Scalr.resize(sourceImage, Method.QUALITY, Mode.FIT_TO_WIDTH,
-							(int) (sourceImage.getWidth() * resizeRatio), org.imgscalr.Scalr.OP_ANTIALIAS);
-					ImageIO.write(resizedImage, "png", new File(fileName));
-					// System.out.println("Saving: " + fileName);
+					ImageIO.write(scaledBufferedImage, "png", new File(fileName));
 					count++;
 				}
 				document.close();
