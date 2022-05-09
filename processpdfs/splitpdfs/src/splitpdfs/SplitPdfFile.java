@@ -32,6 +32,20 @@ public class SplitPdfFile {
 	int fromPage = 1;
 	int toPage = 100;
 	
+	private String padLeftZeros(String inputString, int length) {
+
+		if (inputString.length() >= length) {
+			return inputString;
+		}
+		StringBuilder sb = new StringBuilder();
+		while (sb.length() < length - inputString.length()) {
+			sb.append('0');
+		}
+		sb.append(inputString);
+
+		return sb.toString();
+	}
+	
 	public void proccessPdf(String sourcePdf) {
 
 		try {
@@ -49,7 +63,8 @@ public class SplitPdfFile {
 
 			int i=1;
 			for (PDDocument partialDoc : splitList) {		
-				partialDoc.save(pdfDestDir + File.separator + "mosaic-" + i + ".pdf");
+				partialDoc.save(pdfDestDir + File.separator + "mosaic-" + 
+					padLeftZeros(Integer.toString(i), 3) + ".pdf");
 	            i++;
 			}
 

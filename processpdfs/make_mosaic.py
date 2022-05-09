@@ -17,38 +17,6 @@ def load_images_from_folder(folder):
             images.append(img)
     return images
 
-def pad_images_to_same_size(images):
-	
-    width_max = 0
-    height_max = 0
-    for img in images:
-        h, w = img.shape[:2]
-        width_max = max(width_max, w)
-        height_max = max(height_max, h)
-
-    if (height_max > width_max):
-        width_max = height_max
-    else:
-        height_max = width_max
-      
-    global black_img
-    black_img = np.zeros((height_max,width_max,3), np.uint8)
-
-    images_padded = []
-    for img in images:
-        h, w = img.shape[:2]
-        diff_vert = height_max - h
-        pad_top = diff_vert//2
-        pad_bottom = diff_vert - pad_top
-        diff_hori = width_max - w
-        pad_left = diff_hori//2
-        pad_right = diff_hori - pad_left
-        img_padded = cv2.copyMakeBorder(img, pad_top, pad_bottom, pad_left, pad_right, cv2.BORDER_CONSTANT, value=0)
-        assert img_padded.shape[:2] == (height_max, width_max)
-        images_padded.append(img_padded)
-
-    return images_padded
-
 def make_mosaic_image(images, index):
 	
     mosaic_h1 =  cv2.hconcat([images[index +  0], images[index +  1], images[index +  2], images[index +  3], images[index +  4], images[index +  5], images[index +  6], images[index +  7], images[index +  8], images[index +  9]])
@@ -67,11 +35,11 @@ def make_mosaic_image(images, index):
     return mosaic
 
 global black_img
+black_img = np.zeros((1638,1638,3), np.uint8)
 
 images = load_images_from_folder(src_folder)
-padded = pad_images_to_same_size(images)
 
-image_count = len(padded)
+image_count = len(images)
 if (image_count % 100 == 0):
 	num_faces = image_count // 100
 	num_black = 0
@@ -80,10 +48,11 @@ else:
 	num_black = 100 - (image_count % 100)
 
 for x in range(num_black):
-	padded.append(black_img)
+	images.append(black_img)
 
 for x in range(num_faces):
-    mosaic = make_mosaic_image(padded, x * 100)
+    mosaic = make_mosaic_image(images, x * 100)
     cv2.imwrite(dest_folder + "//face" + str(x+1) + ".png", mosaic)
+    del mosaic
     #if exception from cv2.imwriter above try the line below instead
     #imageio.imsave(dest_folder + "//face" + str(x+1) + ".png", mosaic)

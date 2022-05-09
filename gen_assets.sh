@@ -11,7 +11,7 @@ cd ../../
 
 cd ./processpdfs/extractimages/
 mkdir ../images
-java -jar dist/extractimages.jar
+java -Xmx8G -jar dist/extractimages.jar
 cd ../../
 
 mkdir ./textures

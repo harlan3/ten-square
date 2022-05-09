@@ -34,6 +34,7 @@ public class MergePdfFiles {
 			PDFMergerUtility pdfmerger = new PDFMergerUtility();
 			File dir = new File(pdfDir);
 			File[] directoryListing = dir.listFiles();
+			java.util.Arrays.sort(directoryListing);
 
 			if (directoryListing != null) {
 
