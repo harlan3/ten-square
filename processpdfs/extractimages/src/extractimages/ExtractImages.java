@@ -29,9 +29,6 @@ import org.apache.pdfbox.contentstream.PDFStreamEngine;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
-import org.imgscalr.Scalr.Mode;
 
 public class ExtractImages extends PDFStreamEngine {
 
@@ -85,9 +82,8 @@ public class ExtractImages extends PDFStreamEngine {
 							extractImages.targetHeight, Image.SCALE_SMOOTH);
 					sourceImage.getGraphics().drawImage(scaledImage, 0, 0, null);
 
-					int type = BufferedImage.TYPE_INT_RGB;
 					BufferedImage scaledBufferedImage = new BufferedImage(scaledImage.getWidth(null),
-							scaledImage.getHeight(null), type);
+							scaledImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
 					Graphics g = scaledBufferedImage.createGraphics();
 					g.drawImage(scaledImage, 0, 0, null);
 					g.dispose();

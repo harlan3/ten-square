@@ -26,7 +26,6 @@
       <javac srcdir="${src.dir}" destdir="${build.dir}" debuglevel="${debuglevel}">
          <classpath>
             <pathelement path="${lib.dir}/pdfbox-app-2.0.26.jar"/>
-            <pathelement path="${lib.dir}/imgscalr-lib-4.2.jar"/>
             <pathelement path="${lib.dir}/jai-imageio-core-1.4.0.jar"/>
             <pathelement path="${lib.dir}/jai-imageio-jpeg2000-1.4.0.jar"/>
          </classpath>
