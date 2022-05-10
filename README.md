@@ -12,6 +12,7 @@ Prerequisites:
 * Hardware accelerated Open GL
 * GL_MAX_TEXTURE_SIZE of 16384 or greater
 * Modern g++ compiler
+* Dev libraries for: boost_regex, boost_thread, pthread, png, glut, GLU, GL
 * Python 3 
 * Python modules: cv2, numpy and imageio
 * OpenJDK 11 or newer
