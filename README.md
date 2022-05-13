@@ -16,6 +16,7 @@ Prerequisites:
 * Python 3 
 * Python modules: cv2, numpy and imageio
 * OpenJDK 11 or newer
+* ant java build tool
 
 Setup:
 After installing the prerequisites, run the following scripts:
@@ -42,10 +43,11 @@ Mouse Controls
 * scroll wheel - pan up and down
 
 Keyboard Controls
-* f - toggle full screen mode
-* Z and z - zoom controls (The search tool also has a slider bar for zooming)
-* p - print out camera information for current camera position
-* q - quit
+* ⬆ ⬇ ⬅ ➡ pan and rotation controls
+* f toggle full screen mode
+* + and - zoom controls (The search tool also has a slider bar for zooming)
+* p print out camera information for current camera position
+* q quit
 
 Search Tool
 

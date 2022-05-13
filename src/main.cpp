@@ -29,7 +29,7 @@
 
 void mouseCB(int button, int stat, int x, int y);
 
-GLuint texture[1];
+GLuint texture[1] = { 0 };
 GLuint width = 800;
 GLuint height = 600;
 GLfloat xRot, zRot;
@@ -88,7 +88,7 @@ bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha,
 	png_set_sig_bytes(png_ptr, sig_read);
 	png_read_png(png_ptr, info_ptr,
 	PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND,
-			NULL);
+	NULL);
 
 	png_uint_32 width, height;
 	int bit_depth;
@@ -125,7 +125,9 @@ void loadGLTexture(int faceIndex) {
 		loadPngImage((char*) pngFile, imageWidth, imageHeight, hasAlpha,
 				textureImage);
 
-		// copy the texture to OpenGL
+		if (texture[i])
+			glDeleteTextures(1, &texture[i]);
+
 		glGenTextures(1, &texture[i]);
 
 		// set active texture and configure it
@@ -358,6 +360,7 @@ void reshape(int w, int h) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
+
 	switch (key) {
 
 	case 'f':
@@ -370,18 +373,21 @@ void keyboard(unsigned char key, int x, int y) {
 			fullScreen = false;
 		}
 		break;
-	case 'Z':
+
+	case '-': // Zoom out
 		if (zoomFactor > 1.99) {
 			zoomFactor -= 1.0f;
 			glutPostRedisplay();
 		}
 		break;
-	case 'z':
+
+	case '=': // Zoom in
 		if (zoomFactor < 99.01) {
 			zoomFactor += 1.0f;
 			glutPostRedisplay();
 		}
 		break;
+
 	case 'p':
 		cout << endl;
 		cout << "xRot = " << xRot << endl;
@@ -389,11 +395,38 @@ void keyboard(unsigned char key, int x, int y) {
 		cout << "zDist = " << zDist << endl;
 		cout << "zoomFactor = " << zoomFactor << endl;
 		break;
+
 	case 'q':
 		appRunning = false;
 		break;
 
 	default:
+		break;
+	}
+}
+
+void arrowKeys(int key, int x, int y) {
+
+	switch (key) {
+
+	case GLUT_KEY_UP:
+		zDist -= getZScrollInc() * 0.2;
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_DOWN:
+		zDist += getZScrollInc() * 0.2;
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_LEFT:
+		zRot -= getZRotInc() * 2.0;
+		glutPostRedisplay();
+		break;
+
+	case GLUT_KEY_RIGHT:
+		zRot += getZRotInc() * 2.0;
+		glutPostRedisplay();
 		break;
 	}
 }
@@ -472,6 +505,7 @@ int main(int argc, char **argv) {
 	glutIdleFunc(idleFunction);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(arrowKeys);
 	glutMouseFunc(mouseCB);
 	glutMainLoop();
 	return 0;
