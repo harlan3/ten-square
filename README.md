@@ -45,7 +45,7 @@ Mouse Controls
 Keyboard Controls
 * ⬆ ⬇ ⬅ ➡ pan and rotation controls
 * f toggle full screen mode
-* + and - zoom controls (The search tool also has a slider bar for zooming)
+* + and − zoom controls (The search tool also has a slider bar for zooming)
 * p print out camera information for current camera position
 * q quit
 
