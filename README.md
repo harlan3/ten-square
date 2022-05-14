@@ -46,6 +46,7 @@ Keyboard Controls
 * ⬆ ⬇ ⬅ ➡ pan and rotation controls
 * f toggle full screen mode
 * ± zoom controls (The search tool also has a slider bar for zooming)
+* 1 move camera to home position on mosaic
 * p print out camera information for current camera position
 * q quit
 
