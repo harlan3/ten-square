@@ -363,6 +363,12 @@ void keyboard(unsigned char key, int x, int y) {
 
 	switch (key) {
 
+	case '1':
+		lookAtPage(1);
+		curPageNum = 1;
+		glutPostRedisplay();
+		break;
+
 	case 'f':
 		if (!fullScreen) {
 			glutFullScreen();
