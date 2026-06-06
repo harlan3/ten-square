@@ -83,6 +83,8 @@ public class SearchTool {
 		Display display = new Display();
 		Shell shell = new Shell(display, (SWT.CLOSE | SWT.MIN | SWT.TITLE));
 		shell.setText("Ten-Square Search Tool");
+		shell.setSize(520, 600);
+		shell.setMinimumSize(520, 600);
 
 		// create a new GridLayout with two columns
 		GridLayout layout = new GridLayout(2, false);
