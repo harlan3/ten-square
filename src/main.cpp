@@ -141,9 +141,9 @@ void loadGLTexture(int faceIndex) {
 
 		// copy bitmap data to texture object
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? 4 : 3, imageWidth,
-				imageHeight, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
-				textureImage);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth,
+		        imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, textureImage);
 
 		free(textureImage);
 
