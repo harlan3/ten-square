@@ -40,13 +40,14 @@ import org.w3c.dom.NodeList;
 
 public class ClientMain {
 
-	public DatagramSocket socket;
-	private String multicastIP;
-	private int multicastPort;
-	private InetAddress group;
+	private int portNumber = 0;
+	private boolean useMulticast = false;
 	private String fileName = "settings.xml";
-
-	public ClientMain() {
+    
+	private static ClientMain instance = null;
+	private static NetworkSetup networkSetup = null;
+	
+	private ClientMain() {
 
 		try {
 			// Process XML
@@ -58,12 +59,10 @@ public class ClientMain {
 			if (rootElem != null) {
 				parseElements(rootElem);
 			}
-
-			// Initiate socket
-			socket = new DatagramSocket();
-			multicastIP = SharedData.getInstance().xmlMap.get("MulticastIP");
-			multicastPort = Integer.parseInt(SharedData.getInstance().xmlMap.get("MulticastPort"));
-			group = InetAddress.getByName(multicastIP);
+			
+			useMulticast = Boolean.parseBoolean(SharedData.getInstance().xmlMap.get("UseMulticast"));
+		    portNumber = Integer.parseInt(SharedData.getInstance().xmlMap.get("PortValue"));
+		      
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,11 +71,23 @@ public class ClientMain {
 
 	public void sendUDPMessage(String message) {
 
-		try {
-			byte[] msg = message.getBytes();
-			DatagramPacket packet = new DatagramPacket(msg, msg.length, group, multicastPort);
+		InetAddress ipAddress = null;
 
-			socket.send(packet);
+		try {
+
+			byte[] msg = message.getBytes();
+
+			if (useMulticast)
+				ipAddress = InetAddress.getByName(SharedData.getInstance().xmlMap.get("MulticastAddress"));
+			else
+				ipAddress = InetAddress.getByName(SharedData.getInstance().xmlMap.get("BroadcastAddress"));
+
+			DatagramPacket datagram = new DatagramPacket(msg, msg.length, ipAddress, portNumber);
+
+			if (useMulticast)
+				SharedSocketInterface.getInstance().getMulticastSocket().send(datagram);
+			else
+				SharedSocketInterface.getInstance().getDatagramSocket().send(datagram);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -115,11 +126,21 @@ public class ClientMain {
 		}
 	}
 
-	public static void main2(String[] args) {
+	public static ClientMain getInstance() {
+		
+		if (instance == null) {
+			instance = new ClientMain();
+			networkSetup = new NetworkSetup();
+		}
+		return instance;
+	}
+	
+	public static void main1(String[] args) {
 
-		ClientMain clientMain = new ClientMain();
-		int count = 0;
-
+		ClientMain.getInstance();
+		
+        int count = 0;
+        
 		while (count < 1) {
 
 			JSONObject jsonObject = new JSONObject();
@@ -138,17 +159,15 @@ public class ClientMain {
 			jsonObject.put("humboldt", "This is a string");
 			jsonObject.put("macaroni", base64Bytes);
 
-			clientMain.sendUDPMessage(jsonObject.toString());
+			instance.sendUDPMessage(jsonObject.toString());
 
 			count++;
 			try {
-				Thread.sleep(10);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
-		clientMain.socket.close();
 	}
 }

@@ -23,9 +23,12 @@
 #include <cmath>
 #include <png.h>
 
-#include "JSONObject.hpp"
 #include "server/ServerMain.hpp"
 #include "server/ReceiveDatagramThread.hpp"
+
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 void mouseCB(int button, int stat, int x, int y);
 
@@ -472,21 +475,21 @@ void processMessages() {
 
 		for (JSONPacket packet : packetList) {
 
-			json::JSONObject jsonObject(packet.data);
-			int msgId = jsonObject.getInt("msgId");
+			json jsonObject = json::parse(packet.data);
+			int msgId = jsonObject["msgId"];
 
 			switch (msgId) {
 
 			case 1:
-				newTextureIndex = jsonObject.getInt("newTextureIndex");
+				newTextureIndex = jsonObject["newTextureIndex"];
 				break;
 
 			case 2:
-				newPageNum = jsonObject.getInt("newPageNum");
+				newPageNum = jsonObject["newPageNum"];
 				break;
 
 			case 3:
-				newZoomFactor = jsonObject.getInt("newZoomFactor");
+				newZoomFactor = jsonObject["newZoomFactor"];
 				break;
 			}
 

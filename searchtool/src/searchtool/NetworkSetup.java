@@ -20,28 +20,31 @@
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
-*/
-
+ */
 package searchtool;
 
-import java.util.HashMap;
+public class NetworkSetup {
 
-public class SharedData {
+	NetworkSetup() {
 
-	public HashMap<String, String> xmlMap;
+		boolean useMulticast = Boolean.parseBoolean(SharedData.getInstance().xmlMap.get("UseMulticast"));
+		int portNumber = Integer.parseInt(SharedData.getInstance().xmlMap.get("PortValue"));
+		String multicastAddress = SharedData.getInstance().xmlMap.get("MulticastAddress");
+		String multicastDeviceAddress = SharedData.getInstance().xmlMap.get("MulticastDeviceAddress");
+		String broadcastAddress = SharedData.getInstance().xmlMap.get("BroadcastAddress");
 
-	private static SharedData instance = null;
+		// Initalize application socket
+		SharedSocketInterface.getInstance().initSocket();
 
-	private SharedData() {
-		
-		this.xmlMap = new HashMap<>();
-	}
+		System.out.println("       Listening on port: " + portNumber);
 
-	public static SharedData getInstance() {
-		
-		if (instance == null) {
-			instance = new SharedData();
+		if (useMulticast) {
+
+			System.out.println("       Multicast Address: " + multicastAddress);
+			System.out.println("        Multicast Device: " + multicastDeviceAddress);
+		} else {
+
+			System.out.println("       Broadcast Address: " + broadcastAddress);
 		}
-		return instance;
 	}
 }

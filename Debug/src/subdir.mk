@@ -5,19 +5,16 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/AppConfig.cpp \
-../src/JSONObject.cpp \
 ../src/SharedData.cpp \
 ../src/main.cpp 
 
 CPP_DEPS += \
 ./src/AppConfig.d \
-./src/JSONObject.d \
 ./src/SharedData.d \
 ./src/main.d 
 
 OBJS += \
 ./src/AppConfig.o \
-./src/JSONObject.o \
 ./src/SharedData.o \
 ./src/main.o 
 
@@ -34,7 +31,7 @@ src/%.o: ../src/%.cpp src/subdir.mk
 clean: clean-src
 
 clean-src:
-	-$(RM) ./src/AppConfig.d ./src/AppConfig.o ./src/JSONObject.d ./src/JSONObject.o ./src/SharedData.d ./src/SharedData.o ./src/main.d ./src/main.o
+	-$(RM) ./src/AppConfig.d ./src/AppConfig.o ./src/SharedData.d ./src/SharedData.o ./src/main.d ./src/main.o
 
 .PHONY: clean-src
 

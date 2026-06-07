@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 
 public class SearchTool {
 
-	private ClientMain clientMain = new ClientMain();
+	private ClientMain clientMain = ClientMain.getInstance();
 	private DatabaseAPI databaseAPI = new DatabaseAPI();
 	private List list1;
 	int pdfTextureIndex = 1;
@@ -196,7 +196,7 @@ public class SearchTool {
 			}
 		}
 		display.dispose();
-		clientMain.socket.close();
+		//clientMain.socket.close();
 	}
 
 	public static void main(String[] args) {
